@@ -1,0 +1,17 @@
+routes:
+    group_by:[Alertname] 
+#send mail as notification 
+    receiver: mail-me
+
+receivers:
+- name: mail-me
+  email_configs:
+  - to: 'cnsnoida@gmail.com'
+    from:'chandranitu@gmail.com'
+    smarthost:smtp.gmail.com:587
+    auth_username: 'chandranitu@gmail.com'
+    auth_identity: 'chandranitu@gmail.com'
+    auth_password: '*****'
+	
+
+
