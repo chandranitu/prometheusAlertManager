@@ -4,12 +4,17 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-User=root
-Group=root
+User=kalka
+Group=kalka
 Type=Simple
 ExecStart=/usr/local/bin/alertmanager --config.file /home/kalka/prometheusAlertManager/alertmanager.yml
-
 #    --storage.tsdb.path /home/kalka/alertmanager
 
 [Install]
 WantedBy=multi-user.target
+
+
+
+
+
+

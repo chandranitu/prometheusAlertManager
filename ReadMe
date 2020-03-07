@@ -11,7 +11,9 @@ sudo apt install golang-go
         
         In release section download alertmanager-0.20.0.darwin-386.tar.gz
         Extract file and keep in directory like /home/kalka/alertmanager-0.20.0.darwin-386
-        sudo mv alertmanager-0.20.0.darwin-386/alertmanager /usr/local/bin/
+
+        sudo mv alertmanager /usr/local/bin/
+	sudo mv node_exporter /usr/local/bin/
 
 -- make a directory alertmanager and make file alertmanager.yml
   /home/kalka/alertmanager/alertmanager.yml
@@ -20,8 +22,9 @@ sudo apt install golang-go
 
 -- setup alertmanager service and node exporter
  /home/kalka/prometheusAlertManager/alertmanager.service 
+/home/kalka/prometheusAlertManager/node_exporter.service 
 
-sudo mv node_exporter /var/lib/prometheus/node-exporter
+
 sudo cp alertmanager.service /etc/systemd/system
 sudo cp node_exporter.service /etc/systemd/system
 
@@ -41,9 +44,13 @@ sudo cp alert_rules.yml /etc/prometheus/
         systemctl start alertmanager
 	systemctl stop alertmanager
         systemctl status alertmanager
+	systemctl enable alertmanager
 
 --testing
  now down node exporter a alert message should send on gmail
  systemctl start node_exporter
+
+systemctl status prometheus
+systemctl stop prometheus
 
 
