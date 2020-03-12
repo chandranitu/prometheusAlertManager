@@ -1,0 +1,26 @@
+## Configuration for alertmanager
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 1m
+    route:
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: emailer
+      routes:
+        - match:
+            alertname: Watchdog
+        - match:
+            alertname: TargetDown
+          receiver: emailer  
+    receivers:
+      - name: emailer
+        email_configs:
+          - to: chandranitu@gmail.com
+            from:  chandranitu@gmail.com
+            smarthost: smtp.gmail.com:587
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: Kalka@123

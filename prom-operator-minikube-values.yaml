@@ -1,0 +1,81 @@
+# values_minikube.yaml
+# Tested with stable/prometheus-operator v4.3.6
+# https://medium.com/@eduardobaitello/trying-prometheus-operator-with-helm-minikube-b617a2dccfa3
+coreDns:
+  service:
+    selector:
+      k8s-app: kube-dns
+
+kubeControllerManager:
+  service:
+    selector:
+      k8s-app: kube-dns
+      component: kube-controller-manager
+
+kubeEtcd:
+  service:
+    selector:
+      k8s-app: kube-dns
+      component: etcd
+
+kubeScheduler:
+  service:
+    selector:
+      k8s-app: kube-dns
+      component: kube-scheduler
+
+## Configuration for alertmanager
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 1m
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      # A default receiver
+      receiver: emailer
+      routes:
+        - match:
+            alertname: TargetDown
+          receiver: emailer-DEV
+        - match:
+            alertname: Watchdog
+          receiver: emailer-QA
+        - match:
+            alertname: DeadMansSwitch
+          receiver: emailer-prod
+    receivers:
+      - name: emailer
+        email_configs:
+          - to: cnsnoida@gmail.com
+            from:  chandranitu@gmail.com
+            smarthost: smtp.gmail.com:587
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+      - name: emailer-DEV
+        email_configs:
+          - to: chandranitu@gmail.com
+            from:  chandranitu@gmail.com
+            smarthost: smtp.gmail.com:587
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+      - name: emailer-QA
+        email_configs:
+          - to: chandranitu@gmail.com
+            from:  chandranitu@gmail.com
+            smarthost: smtp.gmail.com:587
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+      - name: emailer-prod
+        email_configs:
+          - to: cnsnoida@gmail.com
+            from:  chandranitu@gmail.com
+            smarthost: smtp.gmail.com:587
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe

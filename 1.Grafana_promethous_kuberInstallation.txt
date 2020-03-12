@@ -1,6 +1,6 @@
 drawback using helm
 https://medium.com/virtuslab/think-twice-before-using-helm-25fbb18bc822
-
+https://grafana.com/blog/2020/02/25/step-by-step-guide-to-setting-up-prometheus-alertmanager-with-slack-pagerduty-and-gmail/
 
 ############# chandra------------------
 https://github.com/avpatel257/spring-micrometer-prometheus 
@@ -19,7 +19,34 @@ curl -v http://10.100.182.175:8080/api/test
 kubectl apply -f k8s/kube.yaml
 kubectl delete -f k8s/kube.yaml
 kubectl get all --namespace=monitoring
+kubectl create -f  k8s/kube-service-monitor.yaml 
+kubectl get prometheus -o yaml -n monitoring
 
+rm /usr/local/bin/helm
+minikube delete
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo update
+sudo kubectl create ns monitoring
+
+helm install stable/prometheus-operator --version=8.10.0 --namespace=monitoring --generate-name --values=k8s/prom-operator-minikube-values.yaml
+kubectl apply -f k8s/kube.yaml
+kubectl apply -f k8s/kube.yaml
+
+kubectl get all -n monitoring
+kubectl get all  --all-namespaces
+kubectl edit service/prometheus-operator-1583919753-grafana  -n monitoring
+kubectl edit service/prometheus-operator-158391-prometheus    -n monitoring
+kubectl edit service/prometheus-operator-158391-alertmanager -n monitoring
+
+kubectl --namespace monitoring get pods -l "release=prometheus-operator-1583919753"
+
+http://10.97.106.50:9090/graph
+http://10.97.78.165:9093/#/alerts
+--------------------
  
 9915  export PATH="/snap/bin/helm:$PATH"
 9916  helm list
@@ -83,6 +110,7 @@ kubectl get all --namespace=monitoring
 9974* git commit -m "Updated readme"
 9975* git push origin master
 9976  kubectl get prometheus -o yaml -n monitoring
+
 
 
 ###############

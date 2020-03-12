@@ -1,0 +1,25 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: spring-micrometer-prometheus-servicemonitor
+  # Change this to the namespace the Prometheus instance is running in
+  labels:
+    app: spring-micrometer-prometheus
+    # This label is very important in order for prometheus operator to pick up this monitor.
+    # Match it to the output of "kubectl get prometheus -o yaml". Look for the release label under "serviceMonitorSelector" section of the output of that command
+    #    serviceMonitorSelector:
+    #      matchLabels:
+    #        release: monitoring
+    #release: monitoring
+    release: prometheus-operator-1583677158
+spec:
+  selector:
+    matchLabels:
+      app: spring-micrometer-prometheus
+  endpoints:
+    - port: web
+      scheme: http
+      interval: 15s
+      path: '/actuator/prometheus'
+      honorLabels: true
