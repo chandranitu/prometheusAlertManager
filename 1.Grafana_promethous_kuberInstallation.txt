@@ -30,22 +30,32 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
+sudo minikube start --vm-driver=none
 sudo kubectl create ns monitoring
 
 helm install stable/prometheus-operator --version=8.10.0 --namespace=monitoring --generate-name --values=k8s/prom-operator-minikube-values.yaml
-kubectl apply -f k8s/kube.yaml
-kubectl apply -f k8s/kube.yaml
+kubectl apply -f k8s/kube-chandra.yaml
+kubectl apply -f k8s/kube-service-monitor.yaml
 
 kubectl get all -n monitoring
-kubectl get all  --all-namespaces
+kubectl get all --all-namespaces
 kubectl edit service/prometheus-operator-1583919753-grafana  -n monitoring
 kubectl edit service/prometheus-operator-158391-prometheus    -n monitoring
 kubectl edit service/prometheus-operator-158391-alertmanager -n monitoring
 
-kubectl --namespace monitoring get pods -l "release=prometheus-operator-1583919753"
+kubectl --namespace monitoring get pods -l "release=prometheus-operator-1584013633"
+
 
 http://10.97.106.50:9090/graph
 http://10.97.78.165:9093/#/alerts
+kubectl get pod 
+kubectl get pod -n monitoring
+
+http://10.101.189.210:8080/api/test
+kubectl get prometheus -o yaml -n monitoring
+kubectl get secret --namespace=monitoring
+kubectl get secret --namespace=monitoring alertmanager-prometheus-operator-158401-alertmanager -o json | jq -r '.data["alertmanager.yaml"]' | base64 --decode 
+
 --------------------
  
 9915  export PATH="/snap/bin/helm:$PATH"

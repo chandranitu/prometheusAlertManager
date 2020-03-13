@@ -1,0 +1,335 @@
+prerequiste:
+spring2.1.2
+docker
+virtualbox
+kubernetes
+minikube
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube
+
+https://prometheus.io/download/
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+nohup ./prometheus &
+
+minikube start --kubernetes-version v1.17.3 --memory=8000 --cpus=4 --vm-driver=hyperkit --disk-size=30g --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
+
+minikube start --kubernetes-version v1.17.3 --memory=8000 --cpus=4 --vm-driver=virtualbox --disk-size=30g --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"
+
+
+minikube start --vm-driver=kvm
+
+
+
+
+
+#############################################################
+#Grafana
+Download Grafana and install, use systemctl to start the Grafana server:
+    sudo systemctl start grafana-server
+verify that Grafana is running by checking the service’s status:
+    sudo systemctl status grafana-server
+
+sudo systemctl enable grafana-server
+
+check url - http://localhost:3000/login    user/pass- admin/admin1
+
+#if using docker then 
+sudo docker pull grafana/grafana
+sudo docker run -d --name=grafana88 -p 3000:3000 grafana/grafana
+
+check url http://dockerip:3000/
+
+##Find IP
+curl -4 icanhazip.com - find the ip
+http://103.219.228.50
+
+##prometheus:
+Download prometheus and install
+prometheus-2.16.0$nohup ./prometheus &
+check url http://localhost:9090/
+
+#if using docker then  
+
+sudo docker pull prom/prometheus
+sudo docker run \
+    -p 9090:9090 \
+    -v /home/kalka/prometheus.yml prom/prometheus
+	
+sudo docker stop -t 300 prom/prometheus
+	
+check url http://dockerip:dockerport/
+
+https://www.youtube.com/watch?v=2wr9njNdywk&t=717s
+
+kubectl create configmap prometheus-example --from-file /home/kalka/prometheus.yml
+
+#Helm
+
+
+
+##Microservices
+https://sysdig.com/blog/kubernetes-monitoring-prometheus/
+
+configure below service in pom.xml
+spring actuator--
+micrometer
+
+#running microservice
+java -jar docker-microservice-0.0.1-SNAPSHOT.jar
+
+check url -http://localhost:8080/actuator
+
+###Kubernetes
+
+The image we created is known to Docker. However, Kubernetes is not aware of the newly built image. This is because your local Docker daemon is not part of the MicroK8s Kubernetes cluster. We can export the built image from the local Docker daemon and “inject” it into the MicroK8s image cache like this:
+
+sudo docker save springbootdocker > myspringbootdocker.tar
+microk8s.ctr image import myspringbootdocker.tar
+
+microk8s.ctr images ls
+microk8s.kubectl apply -f /home/hadoop/serverless/kuberDeployment.yml
+
+microk8s.kubectl get nodes
+sudo microk8s.kubectl run kubernetes-springboot --image=myspringbootdocker --port=8080
+microk8s.kubectl get deployments
+
+#Service object that exposes the deployment:
+microk8s.kubectl expose deployment kubernetes-springboot --type=NodePort
+microk8s.kubectl get services
+
+microk8s.kubectl describe deployments kubernetes-springboot
+
+#Display information about your ReplicaSet objects:
+microk8s.kubectl get replicasets
+microk8s.kubectl describe replicasets
+
+#Display information about the Service:
+microk8s.kubectl describe services kubernetes-springboot
+
+microk8s.kubectl get pods --selector="run=kubernetes-springboot" --output=wide
+
+curl http://localhost:8080
+
+microk8s.enable dns dashboard
+microk8s.kubectl get all --all-namespaces
+
+## dashboard  https://10.152.183.90 
+
+
+##Cleaning up
+To delete the Service, enter this command:
+microk8s.kubectl delete services kubernetes-springboot
+
+To delete the Deployment, the ReplicaSet, and the Pods that are running the Hello World application, enter this command:
+
+microk8s.kubectl delete deployment kubernetes-springboot
+
+snap disable microk8s
+microk8s.disable dashboard dns
+sudo snap remove microk8s
+
+
+--Docker machine-------------------------------
+
+$ curl -L https://github.com/docker/machine/releases/download/v0.16.2/docker-machine-`uname -s`-`uname -m` > /opt/docker-machine/docker-machine
+chmod 755 /opt/docker-machine/docker-machine
+ln -s /opt/docker-machine/docker-machine /usr/bin/docker-machine
+   
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-grafana-on-ubuntu-18-04
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-18-04
+
+https://www.youtube.com/watch?v=dTHfOj3eOz0 
+https://www.youtube.com/watch?v=2wr9njNdywk  spring boot with grafana and prometheus
+
+https://www.howtoforge.com/tutorial/monitor-ubuntu-server-with-prometheus/
+
+
+##View the URL that you can hit via browser
+##/snap/minikube/4/.minikube/config -----congig 
+## check virtual box installed on ubuntu  
+	#docker-machine create --driver virtualbox default
+	#minikube start --vm-driver=virtualbox
+
+minikube service kubernetes-springboot --url
+
+############# Amit
+https://github.com/avpatel257/spring-micrometer-prometheus
+ 
+https://medium.com/faun/trying-prometheus-operator-with-helm-minikube-b617a2dccfa3
+ 
+ 
+ 
+9915  export PATH="/usr/local/opt/helm@2/bin:$PATH"
+9916  helm list
+9917  kubectl get configmap --selector grafana_dashboard=1 --namespace=monitoring
+9918  kubectl get configmap --selector grafana_dashboard=1 --namespace=monitoring monitoring-prometheus-oper-apiserver -o yaml
+9919  kubectl get configmap --namespace=monitoring monitoring-prometheus-oper-apiserver -o yaml
+9920  kubectl get configmap --selector grafana_dashboard=1 --namespace=monitoring
+9921  kubectl get configmap --namespace=monitoring monitoring-prometheus-oper-pods -o yaml
+9922* ll
+9923* kubectl apply -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
+9924  kubectl get prometheus -o yaml
+9925  kubectl get prometheus -o yaml -n monitoring
+9926* kubectl delete -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
+9927* kubectl apply -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
+9928  helm list
+9929  helm del --purge monitoring
+9930  kubectl get all -n monitoring
+9931  kubectl get crd -n monitoring
+9932  kubectl delete crd -n monitoring --all
+9933  clear
+9934* helm install stable/prometheus-operator --version=8.10.0 --name=monitoring --namespace=monitoring --values=k8s/prom-operator-minikube-values.yaml
+9935  watch kubectl get all -n monitoring
+9936  kubectl get all -n monitoring
+9937  kubectl edit svc -n monitoring monitoring-grafana
+9938  kubectl get all -n monitoring
+9939  kubectl edit svc -n monitoring monitoring-prometheus-oper-prometheus
+9940  kubectl get all -n monitoring
+9941* kubectl apply -f k8s/kube.yaml
+9942* kubectl delete -f k8s/kube.yaml
+9943* git st
+9944* git co k8s/kube.yaml
+9945* clear
+9946* kubectl delete -f k8s/kube.yaml
+9947* kubectl apply -f k8s/kube.yaml
+9948  kubectl get po
+9949  kubectl get svc
+9950  kubectl get po -n monitoring
+9951  kubectl logs -f -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 prometheus-config-reloader
+9952  kubectl get svc
+9953  kubectl get svc -n monitoring
+9954* kubectl delete -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
+9955* kubectl apply -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
+9956  kubectl edit svc -n monitoring monitoring-prometheus-oper-alertmanager
+9957  kubectl get svc -n monitoring
+9958  kubectl get secret --namespace=monitoring alertmanager-monitoring-prometheus-oper-alertmanager -o go-template=’{{ index .data “alertmanager.yaml” }}’ | base64 --decode
+9959  history | grep alertmanager
+9960  kubectl get secret --namespace=monitoring alertmanager-monitoring-prometheus-oper-alertmanager -ojson | jq -r '.data["alertmanager.yaml"]' | base64 -d
+9961  kubectl get secret --namespace=monitoring alertmanager-monitoring-prometheus-oper-alertmanager -o json | jq -r '.data["alertmanager.yaml"]' | base64 --decode
+9962  kubectl get svc -n monitoring
+9963  kubectl get po -n monitoring
+9964* git st
+9965* git diff
+9966* git diff src/main/java/com/two57/demo/Controller.java
+9967* git co src/main/java/com/two57/demo/Controller.java
+9968* git diff
+9969* git add .
+9970* git commit -m "Updated readme"
+9971* git push origin master
+9972  history
+9973* git add .
+9974* git commit -m "Updated readme"
+9975* git push origin master
+9976  kubectl get prometheus -o yaml -n monitoring
+
+
+###############
+
+t@kube-VirtualBox:/home/kube#  history
+    1  kubectl get namespaces
+    2  gedit monitoring-namespace.yml
+    3  kubectl apply -f monitoring-namespace.yml 
+    4  kubectl get namespaces
+    5  gedit prometheus-config.yaml
+    6  kubectl apply -f prometheus-config.yaml 
+    7  kubectl get configmap --namespace=monitoring
+    8  gedit prometheus-roles.yml
+    9  kubectl apply -f prometheus-roles.yml 
+   10  gedit prometheus-deployment.yaml
+   11  kubectl apply -f prometheus-deployment.yaml 
+   12  gedit prometheus-deployment.yaml
+   13  kubectl apply -f prometheus-deployment.yaml 
+   14  gedit prometheus-deployment.yaml
+   15  kubectl apply -f prometheus-deployment.yaml 
+   16  kubectl get all --namespace=monitoring
+   17  describe pod/prometheus-558ddbbc79-4nf98
+   18  kubectl delete namespace monitoring
+   19  kubectl get all --namespace=monitoring
+   20  ls
+   21  rm prometheus-config.yaml 
+   22  rm prometheus-deployment.yaml 
+   23  rm prometheus-roles.yml 
+   24  ls
+   25  swapoff -a
+   26  systemctl enable docker
+   27  systemctl status docker
+   28  systemctl start docker
+   29  sudo apt install yum
+   30  sudo apt install curl
+   31  sudo apt install npm
+   32  sudo apt install -y dkms build-essential
+   33  wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+   34  cp minikube-linux-amd64 /usr/local/bin/minikube
+   35  chmod 755 /usr/local/bin/minikube
+   36  minikube version
+   37  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+   38  echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+   39  apt-get update -y
+   40  apt-get install kubectl -y
+   41  kubectl version -o json
+   42  minikube start
+   43  sudo minikube start --vm-driver=none
+   44  kubectl cluster-info
+   45  kubectl config view
+   46  kubectl get nodes
+   47  minikube dashboard --url
+   48  sudo minikube start --vm-driver=none
+   49  curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+   50  chmod 700 get_helm.sh
+   51  ./get_helm.sh
+   52  helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+   53  kubectl create ns monitoring
+   54  helm repo update
+   55  kubectl delete namespace monitoring
+   56  kubectl get namespaces
+   57  exit
+   58  ls /media/sf_VMshared/prometheous/
+   59  cp prome*.*  /media/sf_VMshared/prometheous/
+   60  cp moni*.yml  /media/sf_VMshared/prometheous/
+   61  cp no*.yml  /media/sf_VMshared/prometheous/
+   62  exit
+   63  kubectl apply -f monitoring-namespace.yml 
+   64  kubectl get ns
+   65  kubectl apply -f prometheus-config.yaml 
+   66  kubectl get configmap
+   67  kubectl get configmap --namespace=monitori
+   68  kubectl apply -f prometheus-roles.yml 
+   69  kubectl apply -f prometheus-deployment.yaml 
+   70  gedit prometheus-deployment.yaml 
+   71  kubectl apply -f prometheus-deployment.yaml 
+   72  kubectl get all --namespace=monitoring
+   73  kubectl apply -f prometheus-nodeservice.yaml 
+   74  minikube service --namespace=monitoring
+   75  minikube service --namespace=monitoring prometheus
+   76  exit
+   77  minikube service --namespace=monitoring prometheus
+   78  ls
+   79  helm version
+   80  kubectl edit svc prometheus-grafana
+   81  export EDITOR=gedit
+   82* kubectl edit svc prometheus-gra
+   83  kubectl edit svc prometheus-prometheus-oper-prometheus
+   84  kubectl get cm
+   85  kubectl get cm prometheus-prometheus-oper-prometheus
+   86  ssd
+   87  kubectl get cm prometheus-prometheus-oper-prometheus -o yaml
+   88  man history 
+ 
+[‎2/‎28/‎2020 10:16 AM]  Rapaka, Arun (Associated):  
+next commands
+root@kube-VirtualBox:/home/kube#  helm install --name my-release stable/prometheus-operator 
+ 
+[‎2/‎28/‎2020 10:17 AM]  Rapaka, Arun (Associated):  
+ helm install prometheus  stable/prometheus-operator 
+ 
+Call with Rapaka, Arun (Associated) (arun.rapaka@spglobal.com) has ended. 26 minutes  
+We saved this conversation. You'll see it soon in the Conversations tab in Skype for Business and in the Conversation History folder in Outlook. 
+[‎2/‎28/‎2020 10:53 AM]  Rapaka, Arun (Associated):  
+chandra
+scrum call
+ 
+[‎2/‎28/‎2020 10:53 AM]  Kumar, Chandrashekhar (Associated):  
+yes
+ 
+Connected to Rapaka, Arun (Associated) (arun.rapaka@spglobal.com).  
+
