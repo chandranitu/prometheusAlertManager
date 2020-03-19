@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: spring-micrometer-prometheus-servicemonitor
+  name: spring-micrometer-prometheus
   # Change this to the namespace the Prometheus instance is running in
   labels:
     app: spring-micrometer-prometheus
@@ -12,8 +12,7 @@ metadata:
     #      matchLabels:
     #        release: monitoring
     #release: monitoring
-    release: prometheus-operator-1584618103
-
+    release: spring-micrometer-prometheus
 spec:
   selector:
     matchLabels:
@@ -24,4 +23,6 @@ spec:
       interval: 15s
       path: '/actuator/prometheus'
       honorLabels: true
+
+
 

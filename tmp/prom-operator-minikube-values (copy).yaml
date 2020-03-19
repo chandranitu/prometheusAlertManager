@@ -51,9 +51,6 @@ alertmanager:
         - match:
             alertname: springdown
           receiver: emailer
-        - match:
-            alertname: springdown1
-          receiver: emailer
         
     receivers:
       - name: emailer
@@ -66,10 +63,24 @@ alertmanager:
             auth_password: psqmwxxzimdzlnfe
 
 # Load and evaluate rules in this file every 'evaluation_interval' seconds.
-rule_files:
-    - '~/k8s/alert_rules.yml'
+#rule_files:
+  #  - "~/k8s/alert_rules.yml"
   # - "first.rules"
   # - "second.rules"
+
+groups:
+- name: spring-micrometer-prometheus
+  rules:
+  - alert: springdown
+    expr: http_server_requests_seconds{application="spring-micrometer-demo",uri="/api/test",status="200"} >= 0
+    for: 10s
+    labels:
+      severity: critical
+      k8s-component: 
+    annotations:
+      description: spring member {{ $labels.instance }} has no leader
+      summary: spring down
+
 
 
 scrape_configs:

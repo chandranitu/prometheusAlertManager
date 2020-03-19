@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: spring-micrometer-prometheus
   namespace: default
+  
 spec:
   replicas: 1
   selector:
@@ -13,6 +14,10 @@ spec:
       labels:
         app: spring-micrometer-prometheus
         function: spring-micrometer-prometheus
+      annotations:
+        # Enable custom metrics scraping (optional)
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9090'
     spec:
       containers:
         # TODO: Change following to match your application

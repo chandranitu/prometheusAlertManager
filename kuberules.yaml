@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor 
+metadata:
+  labels:
+    prometheus: k8s
+    role: alertrules
+    name: spring-micrometer-prometheus
+spec:
+  groups:
+  - name: alerting_rules
+    rules:
+      - alert: springdown
+        expr: http_server_requests_seconds{application="spring-micrometer-demo",uri="/api/test",status="200"} >= 0
+        for: 1m
+        labels:
+          severity: major
+        annotations:
+          summary: "Instance {{ $labels.instance }} - high load average"
+          description: "{{ $labels.instance  }} (measured by {{ $labels.job }}) has high load average ({{ $value }}) over 15 minutes."
+
+      - alert: springdown1
+        expr: 100  * (count by(job, namespace, service) (up == 0) / count by(job, namespace, service)(up)) > 10
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} hight memory usage"
+          description: "{{ $labels.instance }} has more than 90% of its memory used."
+
+      - alert: DiskSpace10%Free
+        expr: node_exporter:node_filesystem_free:fs_used_percents >= 90
+        labels:
+          severity: moderate
+        annotations:
+          summary: "Instance {{ $labels.instance }} is low on disk space"
+          description: "{{ $labels.instance }} has only {{ $value }}% free."
