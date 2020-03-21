@@ -1,81 +1,145 @@
-# values_minikube.yaml
-# Tested with stable/prometheus-operator v4.3.6
-# https://medium.com/@eduardobaitello/trying-prometheus-operator-with-helm-minikube-b617a2dccfa3
 coreDns:
   service:
     selector:
       k8s-app: kube-dns
-
 kubeControllerManager:
   service:
     selector:
       k8s-app: kube-dns
       component: kube-controller-manager
-
 kubeEtcd:
   service:
     selector:
       k8s-app: kube-dns
       component: etcd
-
 kubeScheduler:
   service:
     selector:
       k8s-app: kube-dns
       component: kube-scheduler
-
-
-## Configuration for alertmanager
-alerting:
 alertmanager:
   config:
     global:
       resolve_timeout: 1m
     route:
-      group_by: ['alertname', 'cluster', 'service','job']
+      group_by:
+        - alertname
+        - cluster
+        - service
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 12h
-      # A default receiver
       receiver: emailer
       routes:
         - match:
+            alertname: TargetDown-chandraDead
+          receiver: emailerTD
+        - match:
+            alertname: MansSwitch-chandra
+          receiver: emailerWD
+        - match:
             alertname: TargetDown
-          receiver: emailer
+          receiver: emailerTD
         - match:
             alertname: Watchdog
-          receiver: emailer
+          receiver: emailerWD
         - match:
-            alertname: DeadMansSwitch
-          receiver: emailer
+            alertname: RequestRatechandra
+          receiver: emailerRR
         - match:
-            alertname: springdown
-          receiver: emailer
+            alertname: OutOfMemorychandra
+          receiver: emailerTD
         - match:
-            alertname: springdown1
-          receiver: emailer
-        
+            alertname: HighCpuLoadchandra
+          receiver: emailerWD
     receivers:
       - name: emailer
         email_configs:
           - to: cnsnoida@gmail.com
-            from:  chandranitu@gmail.com
-            smarthost: smtp.gmail.com:587
+            from: chandranitu@gmail.com
+            smarthost: 'smtp.gmail.com:587'
             auth_username: chandranitu@gmail.com
             auth_identity: chandranitu@gmail.com
             auth_password: psqmwxxzimdzlnfe
-
-# Load and evaluate rules in this file every 'evaluation_interval' seconds.
-rule_files:
-    - '~/k8s/alert_rules.yml'
-  # - "first.rules"
-  # - "second.rules"
-
-
-scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'spring-micrometer-prometheus'
-# metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-    static_configs:
-    - targets: ['localhost:8080']
+      - name: emailerTD
+        email_configs:
+          - to: cnsnoida@gmail.com
+            from: chandranitu@gmail.com
+            smarthost: 'smtp.gmail.com:587'
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+      - name: emailerWD
+        email_configs:
+          - to: cnsnoida@gmail
+            from: chandranitu@gmail.com
+            smarthost: 'smtp.gmail.com:587'
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+      - name: emailerRR
+        email_configs:
+          - to: cnsnoida@gmail.com
+            from: chandranitu@gmail.com
+            smarthost: 'smtp.gmail.com:587'
+            auth_username: chandranitu@gmail.com
+            auth_identity: chandranitu@gmail.com
+            auth_password: psqmwxxzimdzlnfe
+additionalPrometheusRules:
+  - name: prometheus-operator
+    groups:
+      - name: prometheus-operator
+        rules:
+          - alert: TargetDown-chandra
+            annotations:
+              description: '{{ $value }}% of {{ $labels.job }} targets are down.'
+              summary: Targets are down
+            expr: 100 * (count(up == 0) BY (job) / count(up) BY (job)) > 10
+            for: 10m
+            labels:
+              severity: warning
+          - alert: DeadMansSwitch-chandra
+            annotations:
+              description: >-
+                This is a DeadMansSwitch meant to ensure that the entire
+                Alerting pipeline is functional.
+              summary: Alerting DeadMansSwitch
+            expr: vector(1)
+            labels:
+              severity: none
+          - alert: RequestRatechandra
+            expr: 'rate( http_server_requests_seconds_count{uri="/api/test"}[5m]) > 0'
+            for: 1m
+            labels:
+              severity: high
+            annotations:
+              summary: Application receiving too many requests chandra1
+              message: Application receiving too many requests chandra
+          - alert: OutOfMemorychandra
+            expr: >-
+              node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100
+              < 10
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'Out of memory (instance {{ $labels.instance }})'
+              message: Out of memory chandra
+              description: |-
+                Node memory is filling up (< 10% left)
+                  VALUE = {{ $value }}
+                  LABELS: {{ $labels }}
+          - alert: HighCpuLoadchandra
+            expr: >-
+              100 - (avg by(instance)
+              (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: 'High CPU load (instance {{ $labels.instance }})'
+              message: High CPU load chandra
+              description: |-
+                CPU load is > 80%
+                  VALUE = {{ $value }}
+                  LABELS: {{ $labels }}

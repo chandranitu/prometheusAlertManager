@@ -68,7 +68,7 @@ curl http://10.102.233.133:31463/api/test
   288  curl http://10.107.80.66:31463/api/test
   289  minikube ip
   290  curl http://10.0.2.15:31463/api/test
-  291  curl http://10.0.2.15:30395/api/test -v
+  291  curl http://10.0.2.15:31917/api/test -v
 
 #expr:http_server_requests_seconds{application="spring-micrometer-demo",uri="/api/test",status="200"}
 expr:status=="200" AND application=="spring-micrometer-demo" AND uri=="/api/test"
