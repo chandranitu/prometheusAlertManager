@@ -12,7 +12,7 @@ metadata:
     #      matchLabels:
     #        release: monitoring
     #release: monitoring
-    release: prometheus-operator-1584618103
+    release: prometheus-operator-1587488297
 
 spec:
   selector:

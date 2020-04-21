@@ -1,16 +1,16 @@
-apiVersion: apps/v1
+apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: spring-micrometer-prometheus-servicemonitor
+  name: spring-micrometer-cron
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/1 * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: hello
-            image: busybox
+          - name: spring-micrometer-prometheus
+            image: avpatel257/spring-micrometer-prometheus:latest
             args:
             - /bin/sh
             - -c

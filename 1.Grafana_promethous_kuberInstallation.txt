@@ -6,29 +6,13 @@ https://medium.com/@_ipeacocks/alertmanager-prometheus-notification-configuratio
 https://sysdig.com/blog/kubernetes-monitoring-prometheus/
 
 https://petargitnik.github.io/blog/2018/01/04/how-to-write-rules-for-prometheus       rules---
-
 https://prometheus.io/docs/prometheus/latest/configuration/configuration/
-
-############# chandra------------------
-https://github.com/avpatel257/spring-micrometer-prometheus 
 https://medium.com/faun/trying-prometheus-operator-with-helm-minikube-b617a2dccfa3
+https://github.com/avpatel257/spring-micrometer-prometheus 
 
-sudo mv /home/kalka/.kube /home/kalka/.minikube $HOME
-sudo chown -R $USER /home/kalka/.kube /home/kalka/.minikube
+https://medium.com/jobteaser-dev-team/kubernetes-cronjob-101-56f0a8ea7ca2    --cron job
 
-sudo minikube start --vm-driver=none --memory=8000 --cpus=4
- 
-kubectl describe service/spring-micrometer-prometheus
-kubectl get all --all-namespaces
-kubectl delete service/spring-micrometer-prometheus
-kubectl get pods 
-curl -v http://10.100.182.175:8080/api/test
-kubectl apply -f k8s/kube.yaml
-kubectl delete -f k8s/kube.yaml
-kubectl get all --namespace=monitoring
-kubectl create -f  k8s/kube-service-monitor.yaml 
-kubectl get prometheus -o yaml -n monitoring
---------------- automation
+--------------- automation-------------------------------------
 rm /usr/local/bin/helm
 minikube delete
 
@@ -44,14 +28,39 @@ helm install stable/prometheus-operator --version=8.10.0 --namespace=monitoring 
 kubectl apply -f k8s/kube-chandra.yaml
 kubectl apply -f k8s/kube-service-monitor.yaml
 kubectl get all -n monitoring
------------------------
+--
+--cron job
+kubectl apply -f k8s/cronjob.yaml
+kubectl get cronjob
+
+############# chandra---------------------------------------------------------------------------
+kubectl create -f https://k8s.io/examples/application/job/cronjob.yaml
+kubectl run hello --schedule="*/1 * * * *" --restart=OnFailure --image=busybox -- /bin/sh -c "date; echo Hello from the Kubernetes cluster"
+kubectl get cronjob hello
+pods=$(kubectl get pods --selector=job-name=hello-1587490680 --output=jsonpath={.items[*].metadata.name})
+kubectl logs $pods
+
+kubectl delete cronjob hello
+
+
+kubectl describe service/spring-micrometer-prometheus
+kubectl get all --all-namespaces
+kubectl delete service/spring-micrometer-prometheus
+kubectl get pods 
+curl -v http://10.100.182.175:8080/api/test
+kubectl apply -f k8s/kube.yaml
+kubectl delete -f k8s/kube.yaml
+kubectl get all --namespace=monitoring
+kubectl create -f  k8s/kube-service-monitor.yaml 
+kubectl get prometheus -o yaml -n monitoring
+
+-----------
 kubectl get all --all-namespaces
 kubectl edit service/prometheus-operator-1583919753-grafana  -n monitoring
 kubectl edit service/prometheus-operator-158391-prometheus    -n monitoring
 kubectl edit service/prometheus-operator-158391-alertmanager -n monitoring
 
 kubectl --namespace monitoring get pods -l "release=prometheus-operator-1584013633"
-
 
 http://10.97.106.50:9090/graph
 http://10.97.78.165:9093/#/alerts
@@ -68,11 +77,14 @@ curl http://10.102.233.133:31463/api/test
   288  curl http://10.107.80.66:31463/api/test
   289  minikube ip
   290  curl http://10.0.2.15:31463/api/test
-  291  curl http://10.0.2.15:31917/api/test -v
+  291  curl http://192.168.43.232:30419/api/test -v
 
 #expr:http_server_requests_seconds{application="spring-micrometer-demo",uri="/api/test",status="200"}
 expr:status=="200" AND application=="spring-micrometer-demo" AND uri=="/api/test"
 http_server_requests_seconds{application="spring-micrometer-demo",uri="/api/test",status="200",job="spring-micrometer-prometheus"} 
+
+--test
+sudo kubectl create ns test
 --------------------
  
 9915  export PATH="/snap/bin/helm:$PATH"
@@ -395,4 +407,10 @@ https://www.howtoforge.com/tutorial/monitor-ubuntu-server-with-prometheus/
 minikube service kubernetes-springboot --url
 
  
+--------------------
 
+
+sudo mv /home/kalka/.kube /home/kalka/.minikube $HOME
+sudo chown -R $USER /home/kalka/.kube /home/kalka/.minikube
+
+sudo minikube start --vm-driver=none --memory=8000 --cpus=4
