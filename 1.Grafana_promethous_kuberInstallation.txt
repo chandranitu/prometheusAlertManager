@@ -32,6 +32,8 @@ kubectl get all -n monitoring
 --cron job
 kubectl apply -f k8s/cronjob.yaml
 kubectl get cronjob
+kubectl describe job spring-micrometer-cron
+kubectl describe cronjob spring-micrometer-cron
 
 ############# chandra---------------------------------------------------------------------------
 kubectl create -f https://k8s.io/examples/application/job/cronjob.yaml
