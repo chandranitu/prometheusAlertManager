@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cost-model
+  namespace: kubecost
+  
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: spring-micrometer-prometheus
+  template:
+    metadata:
+      labels:
+        app: spring-micrometer-prometheus
+        function: spring-micrometer-prometheus
+      annotations:
+        # Enable custom metrics scraping (optional)
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9090'
+    spec:
+      containers:
+        # TODO: Change following to match your application
+        - image: chandranitu/spring-micrometer-prometheus:latest
+          imagePullPolicy: Always
+          name: spring-micrometer-prometheus
+          ports:
+            - name: web
+              containerPort: 8080
+          resources:
+            # Max memory/cpu that can be given to this Pod (pod will be terminated if usage goes above the limit value)
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+            # Amount of memory & cpu needed to schedule this pod
+            requests:
+              memory: "256Mi"
+              cpu: "1"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-micrometer-prometheus
+  labels:
+    app: spring-micrometer-prometheus
+  namespace: kubecost
+spec:
+  selector:
+    app: spring-micrometer-prometheus
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: web
+      name: web
+  type: NodePort
+
+
+---
+
