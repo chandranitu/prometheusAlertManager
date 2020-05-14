@@ -38,9 +38,11 @@ kubectl create namespace kubecost
 helm repo add kubecost https://kubecost.github.io/cost-analyzer/
 helm install kubecost kubecost/cost-analyzer --namespace kubecost --set kubecostToken="Y2hhbmRyYW5pdHVAZ21haWwuY29txm343yadf98"
 kubectl apply -f k8s/cost-deploy.yaml
-kubectl port-forward --namespace kubecost deployment/kubecost-cost-analyzer 9090
+kubectl port-forward --namespace kubecost deployment/kubecost-cost-analyzer :5762
+#kubectl port-forward pod/kubecost-cost-analyzer-659585659c-bgdlx :5762
+kubectl -n kubecost get pods    --get pods in namespace
 
-http://localhost:9090
+http://localhost:5762
 http://10.0.2.15:9090
 
 --update
@@ -56,7 +58,13 @@ kubectl describe job spring-micrometer-cron
 kubectl describe cronjob spring-micrometer-cron
 
 
+--grafana
+usr/pass--admin/prom-operator
+http://10.97.198.42/?orgId=1
 
+https://grafana.com/grafana/dashboards/8670
+--promethus
+http://10.106.105.70:9090/graph
 
 
 ############# chandra---------------------------------------------------------------------------
@@ -147,7 +155,7 @@ sudo kubectl create ns test
 9946* kubectl delete -f k8s/kube.yaml
 9947* kubectl apply -f k8s/kube.yaml
 9948  kubectl get po
-9949  kubectl get svc
+
 9950  kubectl get po -n monitoring
 9951  kubectl logs -f -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 prometheus-config-reloader
 9952  kubectl get svc
@@ -155,7 +163,7 @@ sudo kubectl create ns test
 9954* kubectl delete -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
 9955* kubectl apply -f k8s/grafana-dashboards/micrometer-spring-dashboard.yaml
 9956  kubectl edit svc -n monitoring monitoring-prometheus-oper-alertmanager
-9957  kubectl get svc -n monitoring
+
 9958  kubectl get secret --namespace=monitoring alertmanager-monitoring-prometheus-oper-alertmanager -o go-template=’{{ index .data “alertmanager.yaml” }}’ | base64 --decode
 9959  history | grep alertmanager
 9960  kubectl get secret --namespace=monitoring alertmanager-monitoring-prometheus-oper-alertmanager -ojson | jq -r '.data["alertmanager.yaml"]' | base64 -d
